@@ -1,15 +1,17 @@
 const OPENROUTER_BASE = 'https://openrouter.ai/api/v1'
 
 const FREE_VISION_MODELS = [
-  'qwen/qwen2.5-vl-72b-instruct:free',        // 72B, лучшее зрение
-  'meta-llama/llama-3.2-90b-vision-instruct:free', // 90B, 128K контекст
-  'meta-llama/llama-3.2-11b-vision-instruct:free', // резерв
+  'meta-llama/llama-3.2-11b-vision-instruct:free',
+  'meta-llama/llama-3.2-90b-vision-instruct:free',
+  'qwen/qwen2.5-vl-72b-instruct:free',
+  'google/gemma-3-27b-it:free',
 ]
 
 const FREE_TEXT_MODELS = [
-  'meta-llama/llama-3.3-70b-instruct:free',   // 70B, 131K токенов
-  'deepseek/deepseek-r1:free',                 // reasoning-модель
-  'mistralai/mistral-7b-instruct:free',        // быстрый резерв
+  'meta-llama/llama-3.3-70b-instruct:free',
+  'meta-llama/llama-3.1-8b-instruct:free',
+  'mistralai/mistral-7b-instruct:free',
+  'deepseek/deepseek-r1:free',
 ]
 
 const PAID_FALLBACK_VISION = 'anthropic/claude-haiku-4-5'

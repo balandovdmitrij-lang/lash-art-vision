@@ -12,6 +12,7 @@ export function CameraScreen() {
   const [cameraActive, setCameraActive] = useState(false)
   const [cameraError, setCameraError] = useState('')
   const [capturing, setCapturing] = useState(false)
+  const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user')
 
   const setScreen = useAppStore((s) => s.setScreen)
   const setPhoto = useAppStore((s) => s.setPhoto)
@@ -19,7 +20,7 @@ export function CameraScreen() {
   useEffect(() => {
     startCamera()
     return () => stopCamera()
-  }, [])
+  }, [facingMode])
 
   const stopCamera = () => {
     streamRef.current?.getTracks().forEach((t) => t.stop())
@@ -31,7 +32,7 @@ export function CameraScreen() {
     try {
       const constraints: MediaStreamConstraints = {
         video: {
-          facingMode: 'user',
+          facingMode,
           width: { ideal: 1280 },
           height: { ideal: 960 },
         },
@@ -106,7 +107,7 @@ export function CameraScreen() {
           playsInline
           muted
           className="w-full h-full object-cover"
-          style={{ transform: 'scaleX(-1)', display: cameraActive ? 'block' : 'none' }}
+          style={{ transform: facingMode === 'user' ? 'scaleX(-1)' : 'none', display: cameraActive ? 'block' : 'none' }}
         />
 
         {!cameraActive && !cameraError && (
@@ -204,8 +205,13 @@ export function CameraScreen() {
           <div className="w-14 h-14 rounded-full bg-cyber-pink" />
         </motion.button>
 
-        {/* Flip placeholder (for symmetry) */}
-        <div className="w-14 h-14" />
+        {/* Flip camera */}
+        <button
+          onClick={() => { stopCamera(); setCameraActive(false); setFacingMode(f => f === 'user' ? 'environment' : 'user') }}
+          className="w-14 h-14 glass rounded-2xl flex items-center justify-center text-2xl border border-white/10"
+        >
+          🔄
+        </button>
       </div>
 
       <canvas ref={canvasRef} className="hidden" />
