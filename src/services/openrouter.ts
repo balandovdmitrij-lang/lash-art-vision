@@ -1,14 +1,15 @@
 const OPENROUTER_BASE = 'https://openrouter.ai/api/v1'
 
 const FREE_VISION_MODELS = [
-  'meta-llama/llama-3.2-11b-vision-instruct:free',
-  'google/gemma-3-27b-it:free',
+  'qwen/qwen2.5-vl-72b-instruct:free',        // 72B, лучшее зрение
+  'meta-llama/llama-3.2-90b-vision-instruct:free', // 90B, 128K контекст
+  'meta-llama/llama-3.2-11b-vision-instruct:free', // резерв
 ]
 
 const FREE_TEXT_MODELS = [
-  'meta-llama/llama-3.1-8b-instruct:free',
-  'mistralai/mistral-7b-instruct:free',
-  'google/gemma-3-12b-it:free',
+  'meta-llama/llama-3.3-70b-instruct:free',   // 70B, 131K токенов
+  'deepseek/deepseek-r1:free',                 // reasoning-модель
+  'mistralai/mistral-7b-instruct:free',        // быстрый резерв
 ]
 
 const PAID_FALLBACK_VISION = 'anthropic/claude-haiku-4-5'
@@ -33,7 +34,7 @@ async function callModel(
       'HTTP-Referer': window.location.origin,
       'X-Title': 'Lash Art Vision',
     },
-    body: JSON.stringify({ model, messages, stream, max_tokens: 2000 }),
+    body: JSON.stringify({ model, messages, stream, max_tokens: 4000 }),
   })
 }
 
