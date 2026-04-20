@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm create *)",
+      "Bash(cmd.exe /c \"node --version && npm --version\")",
+      "Bash(cmd.exe /c \"node -v\")",
+      "Bash(powershell.exe -Command \"node --version; npm --version\")",
+      "Bash(powershell.exe -Command \"bun --version; deno --version\")",
+      "Bash(powershell.exe -ExecutionPolicy Bypass -Command \"npm --version\")",
+      "Bash(powershell.exe -ExecutionPolicy Bypass -Command \"cd 'c:\\\\Приложение ЛБА'; npm create vite@latest . -- --template react-ts\")",
+      "Bash(powershell.exe -ExecutionPolicy Bypass -Command \"cd 'c:\\\\Приложение ЛБА'; npm create vite@latest . -- --template react-ts --force\")"
+    ]
+  }
+}
