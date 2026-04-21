@@ -1,6 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')!
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
 
 interface EmailPayload {
   user: { email: string }
@@ -20,7 +21,7 @@ const subjects: Record<string, string> = {
 }
 
 const confirmUrl = (payload: EmailPayload) =>
-  `${payload.email_data.site_url}/auth/v1/verify?token=${payload.email_data.token_hash}&type=${payload.email_data.email_action_type}&redirect_to=${payload.email_data.redirect_to}`
+  `${SUPABASE_URL}/auth/v1/verify?token=${payload.email_data.token_hash}&type=${payload.email_data.email_action_type}&redirect_to=${encodeURIComponent(payload.email_data.redirect_to)}`
 
 const templates: Record<string, (url: string) => string> = {
   signup: (url) => `
