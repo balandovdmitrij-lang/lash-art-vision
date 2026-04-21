@@ -1,50 +1,42 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { useAppStore } from './store/appStore'
-import { OnboardingScreen } from './screens/OnboardingScreen'
-import { PrepareScreen } from './screens/PrepareScreen'
-import { CameraScreen } from './screens/CameraScreen'
-import { ValidationScreen } from './screens/ValidationScreen'
-import { AnalysisScreen } from './screens/AnalysisScreen'
-import { PreferencesScreen } from './screens/PreferencesScreen'
-import { ResultScreen } from './screens/ResultScreen'
-import { ChatScreen } from './screens/ChatScreen'
+import { useAuthStore } from './store/authStore'
 
-const screenMap = {
-  onboarding: OnboardingScreen,
-  prepare: PrepareScreen,
-  camera: CameraScreen,
-  validation: ValidationScreen,
-  analysis: AnalysisScreen,
-  preferences: PreferencesScreen,
-  result: ResultScreen,
-  chat: ChatScreen,
-}
+// Auth screens
+import { SplashScreen } from './screens/auth/SplashScreen'
+import { PhoneScreen } from './screens/auth/PhoneScreen'
+import { OTPScreen } from './screens/auth/OTPScreen'
+import { RoleSelectScreen } from './screens/auth/RoleSelectScreen'
+import { ProfileSetupScreen } from './screens/auth/ProfileSetupScreen'
+
+// Authenticated app
+import { AppLayout } from './components/layout/AppLayout'
 
 export default function App() {
-  const screen = useAppStore((s) => s.screen)
-  const Screen = screenMap[screen]
+  const authScreen = useAuthStore((s) => s.authScreen)
+
+  const screen = () => {
+    switch (authScreen) {
+      case 'splash':        return <SplashScreen />
+      case 'phone':         return <PhoneScreen />
+      case 'otp':           return <OTPScreen />
+      case 'role_select':   return <RoleSelectScreen />
+      case 'profile_setup': return <ProfileSetupScreen />
+      case 'app':           return <AppLayout />
+    }
+  }
 
   return (
     <div className="h-full max-w-md mx-auto relative overflow-hidden">
-      {/* Floating ambient orbs */}
-      <div className="orb orb-pink" style={{ top: '-5%', left: '-20%', width: '340px', height: '340px' }} />
-      <div className="orb orb-violet" style={{ top: '45%', right: '-25%', width: '380px', height: '380px' }} />
-      <div className="orb orb-cyan" style={{ bottom: '0%', left: '15%', width: '260px', height: '260px' }} />
-
-      {/* Perspective grid overlay */}
-      <div className="perspective-grid absolute inset-0 pointer-events-none z-0" />
-
-      {/* Screen content */}
       <AnimatePresence mode="wait">
         <motion.div
-          key={screen}
+          key={authScreen}
           initial={{ opacity: 0, x: 30 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -30 }}
           transition={{ duration: 0.3 }}
-          className="h-full relative z-10"
+          className="h-full"
         >
-          <Screen />
+          {screen()}
         </motion.div>
       </AnimatePresence>
     </div>
