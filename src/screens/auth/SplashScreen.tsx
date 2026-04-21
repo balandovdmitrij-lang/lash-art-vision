@@ -1,14 +1,18 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { useAuthStore } from '../../store/authStore'
 import { supabase } from '../../lib/supabase'
 import type { UserProfile } from '../../lib/supabase'
 
 export function SplashScreen() {
-  const { setAuthScreen, setProfile, setUserId, profile } = useAuthStore()
+  const { setAuthScreen, setProfile, setUserId, logout } = useAuthStore()
+  const resolved = useRef(false)
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_, session) => {
+      if (resolved.current) return
+      resolved.current = true
+
       if (session?.user) {
         setUserId(session.user.id)
         const { data } = await supabase
@@ -22,15 +26,18 @@ export function SplashScreen() {
           setAuthScreen('role_select')
         }
       } else {
-        if (profile) {
-          setAuthScreen('app')
-        } else {
-          setAuthScreen('login')
-        }
+        // No valid session — clear stale state and go to login
+        logout()
       }
     })
 
-    const t = setTimeout(() => setAuthScreen('login'), 5000)
+    const t = setTimeout(() => {
+      if (!resolved.current) {
+        resolved.current = true
+        setAuthScreen('login')
+      }
+    }, 5000)
+
     return () => {
       subscription.unsubscribe()
       clearTimeout(t)

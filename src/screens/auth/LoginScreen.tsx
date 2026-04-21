@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { NeonButton } from '../../components/ui/NeonButton'
 import { GlassCard } from '../../components/ui/GlassCard'
 import { useAuthStore } from '../../store/authStore'
-import { signIn, signUp } from '../../lib/auth'
+import { signIn, signUp, resendConfirmation } from '../../lib/auth'
 import { supabase } from '../../lib/supabase'
 import type { UserProfile } from '../../lib/supabase'
 
@@ -16,6 +16,9 @@ export function LoginScreen() {
   const [error, setError] = useState('')
   const [showPass, setShowPass] = useState(false)
   const [checkEmail, setCheckEmail] = useState(false)
+  const [resendCooldown, setResendCooldown] = useState(0)
+  const [resendMsg, setResendMsg] = useState('')
+  const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const { setAuthScreen, setUserId, setEmail: storeSetEmail } = useAuthStore()
 
   const handleLogin = async () => {
@@ -81,6 +84,30 @@ export function LoginScreen() {
     }
   }
 
+  const handleResend = async () => {
+    if (resendCooldown > 0 || !email) return
+    try {
+      await resendConfirmation(email)
+      setResendMsg('Письмо отправлено! Проверь почту и папку «Спам»')
+      setResendCooldown(60)
+      cooldownRef.current = setInterval(() => {
+        setResendCooldown((prev) => {
+          if (prev <= 1) {
+            clearInterval(cooldownRef.current!)
+            return 0
+          }
+          return prev - 1
+        })
+      }, 1000)
+    } catch {
+      setResendMsg('Не удалось отправить. Попробуй через минуту')
+    }
+  }
+
+  useEffect(() => {
+    return () => { if (cooldownRef.current) clearInterval(cooldownRef.current) }
+  }, [])
+
   const switchTab = (t: 'login' | 'register') => {
     setTab(t)
     setError('')
@@ -96,24 +123,51 @@ export function LoginScreen() {
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="text-center z-10 space-y-4"
+          className="text-center z-10 space-y-4 max-w-xs w-full"
         >
           <div className="text-6xl mb-4">📧</div>
           <h2 className="text-2xl font-display font-bold text-white">Проверь почту</h2>
-          <p className="text-text-muted text-sm max-w-xs">
+          <p className="text-text-muted text-sm">
             Мы отправили письмо на{' '}
-            <span className="text-cyber-pink font-semibold">{email}</span>
-            <br />Нажми на ссылку в письме — и ты окажешься в приложении
+            <span className="text-cyber-pink font-semibold break-all">{email}</span>
+            <br /><br />Нажми на ссылку в письме, чтобы подтвердить аккаунт
           </p>
-          <div className="pt-4">
-            <p className="text-text-muted text-xs">Не пришло? Проверь папку «Спам»</p>
-            <button
-              onClick={() => { setCheckEmail(false); setTab('login') }}
-              className="text-cyber-pink text-sm font-semibold mt-3 hover:underline block mx-auto"
-            >
-              Уже подтвердил — войти →
-            </button>
+
+          <div className="glass rounded-2xl p-4 text-left space-y-1 border border-white/10">
+            <p className="text-white text-xs font-medium">Если письмо не пришло:</p>
+            <p className="text-text-muted text-xs">• Проверь папку «Спам» / «Нежелательные»</p>
+            <p className="text-text-muted text-xs">• Подожди 1–2 минуты</p>
+            <p className="text-text-muted text-xs">• Нажми «Отправить повторно» ниже</p>
           </div>
+
+          {resendMsg && (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-green-400 text-xs text-center"
+            >
+              ✓ {resendMsg}
+            </motion.p>
+          )}
+
+          <button
+            onClick={handleResend}
+            disabled={resendCooldown > 0}
+            className={`w-full py-3 rounded-xl text-sm font-semibold border transition-all ${
+              resendCooldown > 0
+                ? 'border-white/10 text-text-muted cursor-not-allowed'
+                : 'border-cyber-pink/40 text-cyber-pink hover:bg-cyber-pink/10'
+            }`}
+          >
+            {resendCooldown > 0 ? `Отправить повторно (${resendCooldown}с)` : 'Отправить письмо повторно'}
+          </button>
+
+          <button
+            onClick={() => { setCheckEmail(false); setTab('login') }}
+            className="text-cyber-pink text-sm font-semibold hover:underline block mx-auto pt-2"
+          >
+            Уже подтвердил — войти →
+          </button>
         </motion.div>
       </div>
     )

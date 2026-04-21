@@ -9,15 +9,17 @@ CREATE TYPE appointment_status AS ENUM ('pending', 'confirmed', 'done', 'cancell
 CREATE TYPE message_type AS ENUM ('text', 'image', 'analysis_card');
 CREATE TYPE platform_type AS ENUM ('ios', 'android', 'web');
 
--- 2. USERS (Firebase UID as PK)
+-- 2. USERS (Supabase Auth UID as PK)
 CREATE TABLE users (
-  id            UUID         PRIMARY KEY,  -- Firebase UID
+  id            UUID         PRIMARY KEY,
   role          user_role    NOT NULL,
-  phone         VARCHAR(20)  UNIQUE NOT NULL,
+  phone         VARCHAR(20)  UNIQUE,
   name          VARCHAR(100) NOT NULL,
   avatar_url    TEXT,
   created_at    TIMESTAMPTZ  DEFAULT NOW()
 );
+-- If you already ran the old schema, run this migration in Supabase SQL editor:
+-- ALTER TABLE users ALTER COLUMN phone DROP NOT NULL;
 
 -- 3. FACE_ANALYSES
 CREATE TABLE face_analyses (

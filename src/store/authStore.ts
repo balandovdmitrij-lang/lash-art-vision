@@ -43,7 +43,8 @@ export const useAuthStore = create<AuthState>()(
         userId: s.userId,
         email: s.email,
         profile: s.profile,
-        authScreen: s.authScreen === 'app' ? 'app' : 'splash',
+        // Always start from splash so session is verified on every load
+        authScreen: 'splash' as const,
       }),
     }
   )
