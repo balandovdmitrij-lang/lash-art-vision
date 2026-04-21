@@ -26,9 +26,8 @@ export function RoleSelectScreen() {
 
   const handleContinue = () => {
     if (!selected) return
-    useAuthStore.setState({ authScreen: 'profile_setup' })
-    // Pass selected role via a temp field
     useAuthStore.setState((s) => ({
+      authScreen: 'profile_setup',
       profile: s.profile ? { ...s.profile, role: selected } : {
         id: s.userId ?? '',
         role: selected,

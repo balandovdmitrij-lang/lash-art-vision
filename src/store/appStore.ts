@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import type { ClientTab, MasterTab } from '../components/layout/TabBar'
 
 export type Screen = 'onboarding' | 'prepare' | 'camera' | 'validation' | 'analysis' | 'preferences' | 'result' | 'chat'
 
@@ -30,6 +31,8 @@ export interface UserPreferences {
 
 interface AppState {
   screen: Screen
+  clientTab: ClientTab
+  masterTab: MasterTab
   photoUrl: string | null
   eyeParams: EyeParams | null
   recommendation: LashRecommendation | null
@@ -38,6 +41,8 @@ interface AppState {
   isLoading: boolean
 
   setScreen: (screen: Screen) => void
+  setClientTab: (tab: ClientTab) => void
+  setMasterTab: (tab: MasterTab) => void
   setPhoto: (url: string) => void
   setEyeParams: (params: EyeParams) => void
   setRecommendation: (rec: LashRecommendation) => void
@@ -49,6 +54,8 @@ interface AppState {
 
 export const useAppStore = create<AppState>((set) => ({
   screen: 'onboarding',
+  clientTab: 'home',
+  masterTab: 'dashboard',
   photoUrl: null,
   eyeParams: null,
   recommendation: null,
@@ -57,6 +64,8 @@ export const useAppStore = create<AppState>((set) => ({
   isLoading: false,
 
   setScreen: (screen) => set({ screen }),
+  setClientTab: (tab) => set({ clientTab: tab }),
+  setMasterTab: (tab) => set({ masterTab: tab }),
   setPhoto: (url) => set({ photoUrl: url }),
   setEyeParams: (params) => set({ eyeParams: params }),
   setRecommendation: (rec) => set({ recommendation: rec }),

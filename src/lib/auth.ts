@@ -1,15 +1,13 @@
 import { supabase } from './supabase'
 
-export async function sendOTP(email: string) {
-  const { error } = await supabase.auth.signInWithOtp({
-    email,
-    options: { shouldCreateUser: true },
-  })
+export async function signIn(email: string, password: string) {
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
   if (error) throw error
+  return data
 }
 
-export async function verifyOTP(email: string, token: string) {
-  const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'email' })
+export async function signUp(email: string, password: string) {
+  const { data, error } = await supabase.auth.signUp({ email, password })
   if (error) throw error
   return data
 }

@@ -1,14 +1,14 @@
 import { motion } from 'framer-motion'
 
 // ── Client tabs ──────────────────────────────────────────────
-export type ClientTab = 'home' | 'ai' | 'catalog' | 'appointments' | 'chat'
+export type ClientTab = 'home' | 'ai' | 'catalog' | 'appointments' | 'chat' | 'theory'
 export type MasterTab = 'dashboard' | 'clients' | 'calendar' | 'chat' | 'profile'
 
 const clientTabs: { id: ClientTab; icon: string; label: string }[] = [
   { id: 'home',         icon: '🏠', label: 'Главная' },
   { id: 'ai',           icon: '✨', label: 'Подбор' },
   { id: 'catalog',      icon: '📖', label: 'Каталог' },
-  { id: 'appointments', icon: '📅', label: 'Записи' },
+  { id: 'theory',       icon: '📚', label: 'Теория' },
   { id: 'chat',         icon: '💬', label: 'Чат' },
 ]
 

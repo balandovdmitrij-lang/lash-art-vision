@@ -3,8 +3,7 @@ import { useAuthStore } from './store/authStore'
 
 // Auth screens
 import { SplashScreen } from './screens/auth/SplashScreen'
-import { PhoneScreen } from './screens/auth/PhoneScreen'
-import { OTPScreen } from './screens/auth/OTPScreen'
+import { LoginScreen } from './screens/auth/LoginScreen'
 import { RoleSelectScreen } from './screens/auth/RoleSelectScreen'
 import { ProfileSetupScreen } from './screens/auth/ProfileSetupScreen'
 
@@ -17,8 +16,7 @@ export default function App() {
   const screen = () => {
     switch (authScreen) {
       case 'splash':        return <SplashScreen />
-      case 'phone':         return <PhoneScreen />
-      case 'otp':           return <OTPScreen />
+      case 'login':         return <LoginScreen />
       case 'role_select':   return <RoleSelectScreen />
       case 'profile_setup': return <ProfileSetupScreen />
       case 'app':           return <AppLayout />

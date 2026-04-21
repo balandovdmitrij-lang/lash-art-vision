@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 
 interface Props {
   children: ReactNode
@@ -8,9 +8,10 @@ interface Props {
   shimmer?: boolean
   delay?: number
   tilt?: boolean
+  style?: CSSProperties
 }
 
-export function GlassCard({ children, className = '', neon = false, shimmer = false, delay = 0, tilt = true }: Props) {
+export function GlassCard({ children, className = '', neon = false, shimmer = false, delay = 0, tilt = true, style }: Props) {
   const borderClass = shimmer
     ? 'shimmer-border'
     : neon
@@ -23,6 +24,7 @@ export function GlassCard({ children, className = '', neon = false, shimmer = fa
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay }}
       className={`rounded-2xl p-4 ${borderClass} ${tilt ? 'card-3d' : ''} ${className}`}
+      style={style}
     >
       {children}
     </motion.div>

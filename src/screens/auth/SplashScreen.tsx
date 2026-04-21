@@ -25,12 +25,12 @@ export function SplashScreen() {
         if (profile) {
           setAuthScreen('app')
         } else {
-          setAuthScreen('phone')
+          setAuthScreen('login')
         }
       }
     })
 
-    const t = setTimeout(() => setAuthScreen('phone'), 5000)
+    const t = setTimeout(() => setAuthScreen('login'), 5000)
     return () => {
       subscription.unsubscribe()
       clearTimeout(t)

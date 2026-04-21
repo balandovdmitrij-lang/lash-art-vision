@@ -4,8 +4,7 @@ import type { UserRole, UserProfile } from '../lib/supabase'
 
 export type AuthScreen =
   | 'splash'
-  | 'phone'
-  | 'otp'
+  | 'login'
   | 'role_select'
   | 'profile_setup'
   | 'app'
@@ -36,7 +35,7 @@ export const useAuthStore = create<AuthState>()(
       setEmail: (email) => set({ email }),
       setProfile: (profile) => set({ profile, authScreen: 'app' }),
       logout: () =>
-        set({ authScreen: 'phone', userId: null, email: null, profile: null }),
+        set({ authScreen: 'login', userId: null, email: null, profile: null }),
     }),
     {
       name: 'lba-auth',
