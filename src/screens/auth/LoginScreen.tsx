@@ -65,17 +65,20 @@ export function LoginScreen() {
       if (!user) throw new Error('no user')
       setUserId(user.id)
       storeSetEmail(email)
-      // If session exists immediately — email confirmation is disabled, go straight in
+      // If session exists — confirmation disabled, go straight in
       if (session) {
         setAuthScreen('role_select')
+      } else if (user.email_confirmed_at) {
+        // Already confirmed — user exists, just needs to sign in
+        setError('Email уже зарегистрирован — нажми «Войти»')
       } else {
-        // Email confirmation required — show "check email" screen
+        // New user — email confirmation required
         setCheckEmail(true)
       }
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : ''
       if (msg.includes('already registered') || msg.includes('already been registered')) {
-        setError('Email уже зарегистрирован — войди')
+        setError('Email уже зарегистрирован — нажми «Войти»')
       } else {
         setError('Ошибка регистрации. Попробуй ещё раз')
       }
