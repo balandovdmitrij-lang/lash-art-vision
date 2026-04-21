@@ -96,6 +96,7 @@ export function ClientTabBar({ active, onChange, unreadChats = 0 }: ClientTabBar
         background: 'rgba(8,8,26,0.92)',
         backdropFilter: 'blur(20px)',
         borderColor: 'rgba(255,45,138,0.15)',
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
       }}
     >
       {clientTabs.map((t) => (
@@ -122,6 +123,7 @@ export function MasterTabBar({ active, onChange, unreadChats = 0 }: MasterTabBar
         background: 'rgba(8,8,26,0.92)',
         backdropFilter: 'blur(20px)',
         borderColor: 'rgba(201,169,110,0.15)',
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
       }}
     >
       {masterTabs.map((t) => (

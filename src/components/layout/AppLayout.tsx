@@ -55,7 +55,7 @@ export function AppLayout() {
         <div className="orb orb-violet pointer-events-none" style={{ top: '45%', right: '-25%', width: '380px', height: '380px' }} />
         <div className="perspective-grid absolute inset-0 pointer-events-none z-0" />
 
-        <div className="flex-1 overflow-hidden relative z-10 pb-16">
+        <div className="flex-1 overflow-hidden relative z-10" style={{ paddingBottom: 'calc(4rem + env(safe-area-inset-bottom, 0px))' }}>
           <AnimatePresence mode="wait">
             <motion.div
               key={clientTab}
@@ -82,7 +82,7 @@ export function AppLayout() {
       <div className="orb pointer-events-none" style={{ bottom: '5%', left: '-15%', width: '280px', height: '280px', background: 'radial-gradient(circle, rgba(201,169,110,0.2) 0%, transparent 70%)' }} />
       <div className="perspective-grid absolute inset-0 pointer-events-none z-0" />
 
-      <div className="flex-1 overflow-hidden relative z-10 pb-16">
+      <div className="flex-1 overflow-hidden relative z-10" style={{ paddingBottom: 'calc(4rem + env(safe-area-inset-bottom, 0px))' }}>
         <AnimatePresence mode="wait">
           <motion.div
             key={masterTab}
