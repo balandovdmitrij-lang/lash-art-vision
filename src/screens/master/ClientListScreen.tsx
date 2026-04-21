@@ -42,7 +42,7 @@ export function ClientListScreen() {
   const filtered = clients.filter((c) =>
     search === '' ||
     c.name.toLowerCase().includes(search.toLowerCase()) ||
-    c.phone.includes(search)
+    (c.phone ?? '').includes(search)
   )
 
   return (

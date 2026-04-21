@@ -2,21 +2,19 @@ import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useAuthStore } from '../../store/authStore'
 import { supabase } from '../../lib/supabase'
-import { auth } from '../../lib/firebase'
-import { onAuthStateChanged } from 'firebase/auth'
 import type { UserProfile } from '../../lib/supabase'
 
 export function SplashScreen() {
-  const { setAuthScreen, setProfile, setFirebaseUid, profile } = useAuthStore()
+  const { setAuthScreen, setProfile, setUserId, profile } = useAuthStore()
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        setFirebaseUid(firebaseUser.uid)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_, session) => {
+      if (session?.user) {
+        setUserId(session.user.id)
         const { data } = await supabase
           .from('users')
           .select('*')
-          .eq('id', firebaseUser.uid)
+          .eq('id', session.user.id)
           .single()
         if (data) {
           setProfile(data as UserProfile)
@@ -24,7 +22,6 @@ export function SplashScreen() {
           setAuthScreen('role_select')
         }
       } else {
-        // No Firebase session — check if we have cached profile
         if (profile) {
           setAuthScreen('app')
         } else {
@@ -32,17 +29,16 @@ export function SplashScreen() {
         }
       }
     })
-    // Fallback timeout in case Firebase is slow
+
     const t = setTimeout(() => setAuthScreen('phone'), 5000)
     return () => {
-      unsub()
+      subscription.unsubscribe()
       clearTimeout(t)
     }
   }, [])
 
   return (
     <div className="h-full flex flex-col items-center justify-center bg-obsidian">
-      {/* Ambient orbs */}
       <div className="orb orb-pink" style={{ top: '10%', left: '-15%', width: '300px', height: '300px' }} />
       <div className="orb orb-violet" style={{ bottom: '10%', right: '-15%', width: '350px', height: '350px' }} />
 
@@ -52,7 +48,6 @@ export function SplashScreen() {
         transition={{ duration: 0.8, ease: [0.34, 1.56, 0.64, 1] }}
         className="text-center relative z-10"
       >
-        {/* Logo mark */}
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
@@ -76,7 +71,6 @@ export function SplashScreen() {
         <div className="text-xs text-text-muted tracking-widest">by @lash.bomba</div>
       </motion.div>
 
-      {/* Loading dots */}
       <motion.div
         className="absolute bottom-16 flex gap-2"
         initial={{ opacity: 0 }}
@@ -92,9 +86,6 @@ export function SplashScreen() {
           />
         ))}
       </motion.div>
-
-      {/* Hidden recaptcha */}
-      <div id="recaptcha-container" />
     </div>
   )
 }

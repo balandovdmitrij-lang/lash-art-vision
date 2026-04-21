@@ -7,7 +7,7 @@ import { supabase } from '../../lib/supabase'
 import type { UserProfile } from '../../lib/supabase'
 
 export function ProfileSetupScreen() {
-  const { firebaseUid, phone, profile } = useAuthStore()
+  const { userId, profile } = useAuthStore()
   const role = profile?.role ?? 'client'
   const [name, setName] = useState('')
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
@@ -24,7 +24,7 @@ export function ProfileSetupScreen() {
   }
 
   const handleSave = async () => {
-    if (!name.trim() || !firebaseUid) return
+    if (!name.trim() || !userId) return
     setLoading(true)
     setError('')
 
@@ -34,7 +34,7 @@ export function ProfileSetupScreen() {
       // Upload avatar if selected
       if (avatarFile) {
         const ext = avatarFile.name.split('.').pop()
-        const path = `avatars/${firebaseUid}.${ext}`
+        const path = `avatars/${userId}.${ext}`
         const { error: uploadErr } = await supabase.storage
           .from('avatars')
           .upload(path, avatarFile, { upsert: true })
@@ -45,9 +45,9 @@ export function ProfileSetupScreen() {
       }
 
       const userProfile: UserProfile = {
-        id: firebaseUid,
+        id: userId,
         role,
-        phone: phone ?? '',
+        phone: null,
         name: name.trim(),
         avatar_url: uploadedAvatarUrl,
         created_at: new Date().toISOString(),
@@ -133,14 +133,6 @@ export function ProfileSetupScreen() {
             />
           </div>
 
-          {/* Phone (readonly) */}
-          <div>
-            <label className="text-text-muted text-xs mb-1 block">Телефон</label>
-            <div className="h-12 px-4 rounded-xl bg-white/3 border border-white/5 flex items-center">
-              <span className="text-text-muted text-sm">{phone}</span>
-              <span className="ml-auto text-green-400 text-xs">✓ подтверждён</span>
-            </div>
-          </div>
 
           {error && (
             <p className="text-red-400 text-sm text-center">⚠️ {error}</p>

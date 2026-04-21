@@ -3,8 +3,7 @@ import { motion } from 'framer-motion'
 import { GlassCard } from '../../components/ui/GlassCard'
 import { NeonButton } from '../../components/ui/NeonButton'
 import { useAuthStore } from '../../store/authStore'
-import { auth } from '../../lib/firebase'
-import { signOut } from 'firebase/auth'
+import { signOut } from '../../lib/auth'
 
 export function MasterProfileScreen() {
   const profile = useAuthStore((s) => s.profile)
@@ -12,7 +11,7 @@ export function MasterProfileScreen() {
   const [showQR, setShowQR] = useState(false)
 
   const handleLogout = async () => {
-    await signOut(auth)
+    await signOut()
     logout()
   }
 

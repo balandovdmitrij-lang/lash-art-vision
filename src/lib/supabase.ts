@@ -10,7 +10,7 @@ export type UserRole = 'client' | 'master'
 export interface UserProfile {
   id: string
   role: UserRole
-  phone: string
+  phone: string | null
   name: string
   avatar_url: string | null
   created_at: string

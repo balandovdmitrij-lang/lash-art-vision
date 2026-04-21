@@ -30,9 +30,9 @@ export function RoleSelectScreen() {
     // Pass selected role via a temp field
     useAuthStore.setState((s) => ({
       profile: s.profile ? { ...s.profile, role: selected } : {
-        id: s.firebaseUid ?? '',
+        id: s.userId ?? '',
         role: selected,
-        phone: s.phone ?? '',
+        phone: null,
         name: '',
         avatar_url: null,
         created_at: new Date().toISOString(),

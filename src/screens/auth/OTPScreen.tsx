@@ -3,8 +3,9 @@ import { motion } from 'framer-motion'
 import { NeonButton } from '../../components/ui/NeonButton'
 import { GlassCard } from '../../components/ui/GlassCard'
 import { useAuthStore } from '../../store/authStore'
-import { sendOTP } from '../../lib/firebase'
+import { sendOTP, verifyOTP } from '../../lib/auth'
 import { supabase } from '../../lib/supabase'
+import type { UserProfile } from '../../lib/supabase'
 
 export function OTPScreen() {
   const [digits, setDigits] = useState(['', '', '', '', '', ''])
@@ -13,17 +14,13 @@ export function OTPScreen() {
   const [timer, setTimer] = useState(60)
   const [canResend, setCanResend] = useState(false)
   const refs = useRef<(HTMLInputElement | null)[]>([])
-  const { phone, confirmationResult, setAuthScreen, setFirebaseUid, setConfirmationResult } = useAuthStore()
+  const { email, setAuthScreen, setUserId } = useAuthStore()
 
   useEffect(() => {
     refs.current[0]?.focus()
     const interval = setInterval(() => {
       setTimer((t) => {
-        if (t <= 1) {
-          setCanResend(true)
-          clearInterval(interval)
-          return 0
-        }
+        if (t <= 1) { setCanResend(true); clearInterval(interval); return 0 }
         return t - 1
       })
     }, 1000)
@@ -36,16 +33,11 @@ export function OTPScreen() {
     newDigits[i] = val.slice(-1)
     setDigits(newDigits)
     if (val && i < 5) refs.current[i + 1]?.focus()
-
-    // Auto-submit when all filled
-    const complete = newDigits.every((d) => d)
-    if (complete) verify(newDigits.join(''))
+    if (newDigits.every((d) => d)) verify(newDigits.join(''))
   }
 
   const handleKeyDown = (i: number, e: React.KeyboardEvent) => {
-    if (e.key === 'Backspace' && !digits[i] && i > 0) {
-      refs.current[i - 1]?.focus()
-    }
+    if (e.key === 'Backspace' && !digits[i] && i > 0) refs.current[i - 1]?.focus()
   }
 
   const handlePaste = (e: React.ClipboardEvent) => {
@@ -59,31 +51,27 @@ export function OTPScreen() {
   }
 
   const verify = async (code: string) => {
-    if (!confirmationResult) {
-      setError('Сессия истекла. Запроси код снова')
-      return
-    }
+    if (!email) { setError('Сессия истекла. Запроси код снова'); return }
     setLoading(true)
     setError('')
     try {
-      const result = await confirmationResult.confirm(code)
-      const uid = result.user.uid
-      setFirebaseUid(uid)
+      const { user } = await verifyOTP(email, code)
+      if (!user) throw new Error('no user')
+      setUserId(user.id)
 
-      // Check if user exists in Supabase
       const { data: existing } = await supabase
         .from('users')
         .select('*')
-        .eq('id', uid)
+        .eq('id', user.id)
         .single()
 
       if (existing) {
-        useAuthStore.getState().setProfile(existing)
+        useAuthStore.getState().setProfile(existing as UserProfile)
       } else {
         setAuthScreen('role_select')
       }
     } catch {
-      setError('Неверный код. Проверь SMS')
+      setError('Неверный код. Проверь почту')
       setDigits(['', '', '', '', '', ''])
       refs.current[0]?.focus()
     } finally {
@@ -92,13 +80,12 @@ export function OTPScreen() {
   }
 
   const resend = async () => {
-    if (!phone || !canResend) return
+    if (!email || !canResend) return
     setTimer(60)
     setCanResend(false)
     setError('')
     try {
-      const result = await sendOTP(phone)
-      setConfirmationResult(result)
+      await sendOTP(email)
     } catch {
       setError('Не удалось отправить. Попробуй позже')
     }
@@ -124,16 +111,15 @@ export function OTPScreen() {
         className="w-full space-y-6"
       >
         <div className="text-center">
-          <div className="text-4xl mb-3">📱</div>
+          <div className="text-4xl mb-3">📧</div>
           <h2 className="text-2xl font-display font-bold text-white mb-2">Введи код</h2>
           <p className="text-text-muted text-sm">
-            Отправили SMS на{' '}
-            <span className="text-cyber-pink font-semibold">{phone}</span>
+            Отправили код на{' '}
+            <span className="text-cyber-pink font-semibold">{email}</span>
           </p>
         </div>
 
         <GlassCard className="p-6">
-          {/* OTP inputs */}
           <div className="flex gap-3 justify-center mb-6" onPaste={handlePaste}>
             {digits.map((d, i) => (
               <motion.input
@@ -176,7 +162,6 @@ export function OTPScreen() {
           </NeonButton>
         </GlassCard>
 
-        {/* Resend */}
         <div className="text-center">
           {canResend ? (
             <motion.button
