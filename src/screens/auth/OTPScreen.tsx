@@ -8,7 +8,7 @@ import { supabase } from '../../lib/supabase'
 import type { UserProfile } from '../../lib/supabase'
 
 export function OTPScreen() {
-  const [digits, setDigits] = useState(['', '', '', '', '', ''])
+  const [digits, setDigits] = useState(['', '', '', '', '', '', '', ''])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [timer, setTimer] = useState(60)
@@ -32,7 +32,7 @@ export function OTPScreen() {
     const newDigits = [...digits]
     newDigits[i] = val.slice(-1)
     setDigits(newDigits)
-    if (val && i < 5) refs.current[i + 1]?.focus()
+    if (val && i < 7) refs.current[i + 1]?.focus()
     if (newDigits.every((d) => d)) verify(newDigits.join(''))
   }
 
@@ -41,11 +41,11 @@ export function OTPScreen() {
   }
 
   const handlePaste = (e: React.ClipboardEvent) => {
-    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6)
-    if (pasted.length === 6) {
+    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 8)
+    if (pasted.length === 8) {
       const arr = pasted.split('')
       setDigits(arr)
-      refs.current[5]?.focus()
+      refs.current[7]?.focus()
       verify(pasted)
     }
   }
@@ -72,7 +72,7 @@ export function OTPScreen() {
       }
     } catch {
       setError('Неверный код. Проверь почту')
-      setDigits(['', '', '', '', '', ''])
+      setDigits(['', '', '', '', '', '', '', ''])
       refs.current[0]?.focus()
     } finally {
       setLoading(false)
@@ -120,7 +120,7 @@ export function OTPScreen() {
         </div>
 
         <GlassCard className="p-6">
-          <div className="flex gap-3 justify-center mb-6" onPaste={handlePaste}>
+          <div className="flex gap-1.5 justify-center mb-6" onPaste={handlePaste}>
             {digits.map((d, i) => (
               <motion.input
                 key={i}
@@ -133,7 +133,7 @@ export function OTPScreen() {
                 onKeyDown={(e) => handleKeyDown(i, e)}
                 animate={d ? { scale: [1, 1.1, 1] } : {}}
                 transition={{ duration: 0.15 }}
-                className={`w-11 h-14 text-center text-2xl font-bold rounded-xl border transition-all focus:outline-none ${
+                className={`w-9 h-12 text-center text-xl font-bold rounded-xl border transition-all focus:outline-none ${
                   d
                     ? 'bg-cyber-pink/20 border-cyber-pink text-white shadow-neon-sm'
                     : 'bg-white/5 border-white/15 text-white focus:border-cyber-pink/60'
@@ -153,8 +153,8 @@ export function OTPScreen() {
           )}
 
           <NeonButton
-            onClick={() => code.length === 6 && verify(code)}
-            disabled={code.length < 6 || loading}
+            onClick={() => code.length === 8 && verify(code)}
+            disabled={code.length < 8 || loading}
             fullWidth
             variant="gradient"
           >
