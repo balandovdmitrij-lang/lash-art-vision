@@ -15,6 +15,7 @@ export function LoginScreen() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [showPass, setShowPass] = useState(false)
+  const [checkEmail, setCheckEmail] = useState(false)
   const { setAuthScreen, setUserId, setEmail: storeSetEmail } = useAuthStore()
 
   const handleLogin = async () => {
@@ -57,11 +58,17 @@ export function LoginScreen() {
     setLoading(true)
     setError('')
     try {
-      const { user } = await signUp(email, password)
+      const { user, session } = await signUp(email, password)
       if (!user) throw new Error('no user')
       setUserId(user.id)
       storeSetEmail(email)
-      setAuthScreen('role_select')
+      // If session exists immediately — email confirmation is disabled, go straight in
+      if (session) {
+        setAuthScreen('role_select')
+      } else {
+        // Email confirmation required — show "check email" screen
+        setCheckEmail(true)
+      }
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : ''
       if (msg.includes('already registered') || msg.includes('already been registered')) {
@@ -79,6 +86,37 @@ export function LoginScreen() {
     setError('')
     setPassword('')
     setConfirm('')
+  }
+
+  // "Check email" state after registration
+  if (checkEmail) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center px-6 bg-obsidian">
+        <div className="orb orb-violet" style={{ top: '-5%', left: '-15%', width: '260px', height: '260px' }} />
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center z-10 space-y-4"
+        >
+          <div className="text-6xl mb-4">📧</div>
+          <h2 className="text-2xl font-display font-bold text-white">Проверь почту</h2>
+          <p className="text-text-muted text-sm max-w-xs">
+            Мы отправили письмо на{' '}
+            <span className="text-cyber-pink font-semibold">{email}</span>
+            <br />Нажми на ссылку в письме — и ты окажешься в приложении
+          </p>
+          <div className="pt-4">
+            <p className="text-text-muted text-xs">Не пришло? Проверь папку «Спам»</p>
+            <button
+              onClick={() => { setCheckEmail(false); setTab('login') }}
+              className="text-cyber-pink text-sm font-semibold mt-3 hover:underline block mx-auto"
+            >
+              Уже подтвердил — войти →
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    )
   }
 
   return (
