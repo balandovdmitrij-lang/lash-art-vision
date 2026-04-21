@@ -19,7 +19,11 @@ export async function signUp(email: string, password: string) {
 }
 
 export async function resendConfirmation(email: string) {
-  const { error } = await supabase.auth.resend({ type: 'signup', email })
+  const { error } = await supabase.auth.resend({
+    type: 'signup',
+    email,
+    options: { emailRedirectTo: window.location.origin },
+  })
   if (error) throw error
 }
 

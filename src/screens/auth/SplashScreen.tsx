@@ -9,7 +9,7 @@ export function SplashScreen() {
   const resolved = useRef(false)
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_, session) => {
+    const handleSession = async (session: Parameters<Parameters<typeof supabase.auth.onAuthStateChange>[0]>[1]) => {
       if (resolved.current) return
       resolved.current = true
 
@@ -26,8 +26,21 @@ export function SplashScreen() {
           setAuthScreen('role_select')
         }
       } else {
-        // No valid session — clear stale state and go to login
         logout()
+      }
+    }
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN') {
+        // Handles email confirmation redirect — SIGNED_IN fires after token exchange
+        handleSession(session)
+      } else if (event === 'INITIAL_SESSION') {
+        if (session) {
+          // Existing valid session (returning user)
+          handleSession(session)
+        }
+        // If INITIAL_SESSION has no session, keep waiting for SIGNED_IN
+        // (email confirmation redirect fires SIGNED_IN after INITIAL_SESSION)
       }
     })
 
